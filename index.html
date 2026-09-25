@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestão de Serviços · Capitalis</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+:root{
+  --bg:#101406; --panel:#1a200a; --surface:#161b08; --line:#2c3314;
+  --text:#eef1dd; --muted:#a4aa7c; --accent:#887C00; --accent2:#384010; --gold:#d8cf4e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+.top{background:linear-gradient(135deg,#384010,#887C00);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:5;box-shadow:0 4px 18px rgba(0,0,0,.45)}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand img{height:56px;width:56px;border-radius:12px;box-shadow:0 6px 16px rgba(0,0,0,.4);background:#fff}
+.brand h1{font-size:clamp(1rem,2vw,1.3rem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand p{font-size:.75rem;color:#e9ecd0}
+.top nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.top nav a,.top nav button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);padding:8px 13px;border-radius:10px;font-size:.83rem;cursor:pointer;text-decoration:none;transition:.15s}
+.top nav a:hover,.top nav button:hover{background:rgba(255,255,255,.25)}
+.top nav a.active{background:#d8cf4e;color:#101406;border-color:#d8cf4e;font-weight:800}
+.userchip{display:none;align-items:center;gap:8px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.3);padding:6px 12px;border-radius:999px;color:#fff;font-size:.8rem;font-weight:700}
+.userchip.on{display:inline-flex}
+.userchip .setor{background:#d8cf4e;color:#101406;padding:2px 8px;border-radius:999px;font-size:.7rem;font-weight:800}
+main{max-width:1100px;margin:0 auto;padding:22px 16px 60px;display:flex;flex-direction:column;gap:22px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
+.panel h2{font-size:1.05rem;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.panel h2 .badge{background:var(--accent);color:#101406;font-size:.75rem;font-weight:800;padding:3px 9px;border-radius:999px}
+.panel h3{font-size:.95rem;margin:18px 0 10px;color:var(--gold)}
+.login{max-width:430px;margin:26px auto;width:100%}
+.login .ic{font-size:2.2rem;text-align:center}
+.login h2{justify-content:center;margin-top:8px}
+.login p{color:var(--muted);font-size:.87rem;text-align:center;margin-bottom:16px;line-height:1.5}
+.login label{margin-bottom:11px}
+.login .btn{width:100%;margin-top:4px}
+.login .alt{text-align:center;margin-top:14px;font-size:.8rem}
+.login .alt a{color:var(--gold)}
+.setorbox{max-width:640px;margin:26px auto;width:100%;text-align:center}
+.setorbox .ic{font-size:2.2rem}
+.setorbox p{color:var(--muted);font-size:.9rem;margin:8px 0 16px}
+.setores{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.setorbtn{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 12px;cursor:pointer;color:var(--text);font-size:1rem;font-weight:800;transition:.15s;display:flex;flex-direction:column;gap:8px;align-items:center}
+.setorbtn:hover{border-color:var(--accent);background:#232a0e;transform:translateY(-2px)}
+.setorbtn .si{font-size:1.6rem}
+.gate{max-width:440px;margin:10px auto;text-align:center}
+.gate .ic{font-size:2.4rem}
+.gate h2{justify-content:center;margin-top:8px}
+.gate p{color:var(--muted);font-size:.88rem;margin-bottom:16px;line-height:1.5}
+.gate input{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:1.05rem;color:var(--text);width:100%;text-align:center;letter-spacing:2px}
+.gate input:focus{outline:2px solid var(--accent)}
+.gate .btn{width:100%;margin-top:12px}
+.gate .err{color:#ff8d7a;font-size:.83rem;margin-top:10px;display:none}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+label{display:flex;flex-direction:column;gap:5px;font-size:.8rem;color:var(--muted)}
+input,select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:1rem;color:var(--text);width:100%;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+textarea{min-height:84px;resize:vertical}
+input[type=date]{color-scheme:dark}
+.span2{grid-column:span 2}
+.btn{background:linear-gradient(135deg,#887C00,#384010);color:#fff;border:none;padding:14px 22px;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;transition:.15s;justify-self:start}
+.btn:hover{filter:brightness(1.15)}
+.msg{margin-top:12px;padding:12px 14px;border-radius:10px;font-size:.9rem;display:none}
+.msg.ok{display:block;background:#233011;border:1px solid var(--accent);color:var(--gold)}
+.msg.err{display:block;background:#3a1a12;border:1px solid #b3402a;color:#ffb4a8}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:9px}
+.card .row1{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.card .code{font-size:.75rem;color:var(--muted);letter-spacing:.5px}
+.card .who{font-weight:700;font-size:1rem}
+.card .desc{font-size:.87rem;color:var(--muted);line-height:1.45;word-break:break-word}
+.card .meta{font-size:.78rem;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.card .reqby{font-size:.8rem;color:var(--gold);font-weight:700}
+.card .entrega{font-size:.9rem;color:var(--gold);font-weight:700}
+.card .atraso{color:#ff8d7a}
+.card .hoje{color:#ffd76a}
+.tag{font-size:.7rem;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.t-software{background:#887C00;color:#101406}
+.t-hardware{background:#384010;color:#eef1dd;border:1px solid #68701C}
+.t-portal{background:#d8cf4e;color:#101406}
+.st-pend{background:#2c3314;color:var(--gold);border:1px solid #4a541f}
+.st-ace{background:#887C00;color:#101406}
+.st-ent{background:#4c7a1f;color:#eef1dd}
+.st-rec{background:#7a2e1e;color:#ffd9d0}
+.sug{font-size:.75rem;color:var(--muted);font-style:italic}
+.acceptRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.acceptRow input[type=date]{flex:1;min-width:150px;padding:10px 12px;font-size:.92rem}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions button{border:none;border-radius:9px;padding:10px 13px;font-size:.82rem;font-weight:700;cursor:pointer;transition:.15s}
+.actions .ok{background:#887C00;color:#101406}
+.actions .no{background:#7a2e1e;color:#ffd9d0}
+.actions .ent{background:#4c7a1f;color:#fff}
+.actions button:hover{filter:brightness(1.2)}
+.empty{color:var(--muted);font-size:.9rem;padding:10px 0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:4px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px;text-align:center}
+.stat b{display:block;font-size:1.5rem;color:var(--gold)}
+.stat span{font-size:.75rem;color:var(--muted)}
+.calnav{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.calnav button{background:var(--surface);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 14px;cursor:pointer;font-size:.9rem}
+.calnav button:hover{border-color:var(--accent)}
+.calnav .mes{font-weight:800;font-size:1.05rem;text-transform:capitalize;min-width:170px;text-align:center}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal .dow{text-align:center;font-size:.72rem;color:var(--muted);font-weight:800;padding:6px 0;text-transform:uppercase}
+.cal .cell{background:var(--surface);border:1px solid var(--line);border-radius:10px;min-height:86px;padding:6px;display:flex;flex-direction:column;gap:4px;cursor:pointer;transition:.12s}
+.cal .cell:hover{border-color:var(--accent)}
+.cal .cell.out{opacity:.32}
+.cal .cell.today{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.cal .cell.sel{outline:2px solid var(--accent)}
+.cal .num{font-size:.78rem;font-weight:800;color:var(--muted)}
+.cal .cell.today .num{color:var(--gold)}
+.chip{font-size:.62rem;font-weight:800;padding:3px 5px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#101406}
+.chip.t-hardware{color:#eef1dd}
+.chip.more{background:transparent;color:var(--muted);border:1px dashed var(--line)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:.78rem;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-2px}
+.daydetail{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:none}
+.daydetail.show{display:block}
+.daydetail h4{font-size:.9rem;margin-bottom:8px;color:var(--gold)}
+.daydetail ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.daydetail li{font-size:.87rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.prox{display:flex;flex-direction:column;gap:8px}
+.prox .p-item{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:.88rem;flex-wrap:wrap}
+.prox .p-date{font-weight:800;color:var(--gold);min-width:92px}
+footer{text-align:center;color:var(--muted);font-size:.75rem;padding:18px}
+@media(max-width:720px){
+  .span2{grid-column:span 1}
+  .cal .cell{min-height:64px;padding:4px}
+  .cal .chip{display:none}
+  .brand img{height:46px;width:46px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <img src="/logo-capitalis.png" alt="Capitalis">
+    <div>
+      <h1 id="hTitle">Gestão de Serviços</h1>
+      <p>Capitalis Assessoria Contábil · Sumaré</p>
+    </div>
+  </div>
+  <nav id="nav">
+    <a href="/solicitante" data-v="/solicitante" data-priv="1" style="display:none">Solicitante</a>
+    <a href="/recebedor" data-v="/recebedor" data-priv="1" style="display:none">Recebedor</a>
+    <span class="userchip" id="userChip"></span>
+    <button id="btnSair" style="display:none">Sair</button>
+    <a href="http://2.25.219.241:1945/">Painel</a>
+    <a href="http://2.25.219.241:8001/">Ton · IA</a>
+  </nav>
+</header>
+
+<main id="app"></main>
+<footer>Capitalis Assessoria Contábil · Sumaré — usuários compartilhados com o Painel de Clientes · só o setor <strong>TI</strong> recebe as solicitações e escolhe a data de entrega</footer>
+
+<script>
+var view = location.pathname;
+if (view === '/index.html') view = '/';
+if (view !== '/' && view !== '/solicitante' && view !== '/recebedor') view = '/';
+var API = '/api/solicitacoes';
+var TIPOS = { software: 'Software', hardware: 'Hardware', portal: 'Portal do Cliente' };
+var ST = { pendente: 'Pendente', aceita: 'Aceita', entregue: 'Entregue', recusada: 'Recusada' };
+var DOW = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+var MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+var SETORES = [
+  { v: 'TI', i: '💻', d: 'Tecnologia' },
+  { v: 'DP', i: '📋', d: 'Departamento Pessoal' },
+  { v: 'FISCAL', i: '📄', d: 'Fiscal' },
+  { v: 'RH', i: '👥', d: 'Recursos Humanos' },
+  { v: 'CONTADOR', i: '🧮', d: 'Contabilidade', joao: true },
+  { v: 'FINANCEIRO', i: '💰', d: 'Financeiro' }
+];
+var items = [], selDay = null, authed = false, polling = null, meData = null;
+var hoje = new Date(); hoje.setHours(0,0,0,0);
+var calD = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+var app = document.getElementById('app');
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function ymd(d){ var m=String(d.getMonth()+1); var day=String(d.getDate()); return d.getFullYear()+'-'+(m.length<2?'0'+m:m)+'-'+(day.length<2?'0'+day:day); }
+function somaDias(d, n){ var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()+n); return ymd(x); }
+function parseYMD(s){ var p=String(s).split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+function dataEntrega(it){ return it.status==='entregue' && it.entregue_em ? it.entregue_em.slice(0,10) : it.entrega_prevista; }
+function fmtBR(s){ if(!s) return '—'; var d=parseYMD(s.slice(0,10)); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+function resta(s){ var d=parseYMD(s); return Math.round((d-hoje)/86400000); }
+function tok(){ return sessionStorage.getItem('svToken') || ''; }
+function sess(){ return localStorage.getItem('svSession') || ''; }
+function sair(force){
+  var t = sess();
+  if (t && !force) fetch('/api/logout', { method:'POST', headers:{ 'x-session': t } }).catch(function(){});
+  localStorage.removeItem('svSession'); meData = null;
+  location.href = '/';
+}
+
+async function api(path, opts){
+  opts = opts || {};
+  opts.headers = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
+  if (sess()) opts.headers['x-session'] = sess();
+  if (tok()) opts.headers['x-admin-token'] = tok();
+  var r = await fetch(path, opts);
+  var j = await r.json().catch(function(){ return {}; });
+  if (r.status === 401){
+    if (j.code === 'sessao' || path === '/api/me'){ sair(true); throw new Error('não conectado'); }
+    if (j.code === 'token'){ sessionStorage.removeItem('svToken'); authed = false; }
+  }
+  if (!r.ok) throw new Error(j.erro || ('Erro ' + r.status));
+  return j;
+}
+
+function navState(){
+  var priv = !!meData;
+  Array.prototype.forEach.call(document.querySelectorAll('#nav a[data-priv]'), function(a){
+    var ehRecebedor = a.getAttribute('data-v') === '/recebedor';
+    a.style.display = (priv && (!ehRecebedor || meData.setor === 'TI')) ? '' : 'none';
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('#nav a[data-v]'), function(a){
+    a.classList.toggle('active', a.getAttribute('data-v') === view);
+  });
+  var chip = document.getElementById('userChip');
+  var sairBtn = document.getElementById('btnSair');
+  if (priv && meData.setor){
+    chip.className = 'userchip on';
+    chip.innerHTML = '👤 ' + esc(meData.label) + ' <span class="setor">' + esc(meData.setor) + '</span>';
+    sairBtn.style.display = '';
+  } else { chip.className = 'userchip'; chip.innerHTML = ''; sairBtn.style.display = 'none'; }
+  var t = { '/': 'Gestão de Serviços', '/solicitante': 'Solicitar serviços', '/recebedor': 'Receber serviços' }[view];
+  document.getElementById('hTitle').textContent = t;
+  document.title = t + ' · Capitalis';
+}
+document.getElementById('btnSair').onclick = function(){ sair(); };
+
+function renderLogin(erro){
+  app.innerHTML =
+    '<div class="panel login">' +
+      '<div class="ic">🔐</div>' +
+      '<h2>Sistema de Usuários</h2>' +
+      '<p>Entre com o mesmo usuário e senha do <strong>Painel de Clientes</strong>.<br>Na primeira vez você escolhe o seu setor.</p>' +
+      '<label>Usuário<input id="logUser" autocomplete="username" placeholder="Ex.: Mayara"></label>' +
+      '<label>Senha<input id="logPass" type="password" autocomplete="current-password" placeholder="Sua senha"></label>' +
+      '<button class="btn" id="logBtn">Entrar</button>' +
+      '<div class="msg' + (erro ? ' err' : '') + '" id="logMsg">' + esc(erro || '') + '</div>' +
+      '<p class="alt">É o mesmo acesso do <a href="http://2.25.219.241:1945/">Painel de Clientes</a></p>' +
+    '</div>';
+  document.getElementById('logBtn').onclick = fazerLogin;
+  document.getElementById('logPass').onkeydown = function(e){ if (e.key === 'Enter') fazerLogin(); };
+  navState();
+}
+
+async function fazerLogin(){
+  var msg = document.getElementById('logMsg');
+  msg.className = 'msg'; msg.textContent = '';
+  var b = document.getElementById('logBtn');
+  b.disabled = true; b.textContent = 'Verificando…';
+  try {
+    var j = await api('/api/login', { method:'POST', body: JSON.stringify({
+      label: document.getElementById('logUser').value,
+      senha: document.getElementById('logPass').value
+    })});
+    localStorage.setItem('svSession', j.token);
+    meData = j;
+    if (j.precisaSetor) renderSetor(j);
+    else location.href = '/solicitante';
+  } catch (e){
+    msg.className = 'msg err'; msg.textContent = e.message;
+    b.disabled = false; b.textContent = 'Entrar';
+  }
+}
+
+function renderSetor(me){
+  var opcoes = SETORES.filter(function(s){ return !s.joao || me.podeContador; });
+  app.innerHTML =
+    '<div class="panel setorbox">' +
+      '<div class="ic">🧭</div>' +
+      '<h2>Olá, ' + esc(me.label) + '!</h2>' +
+      '<p>Escolha o seu setor — só é perguntado na primeira vez.</p>' +
+      '<div class="setores">' +
+        opcoes.map(function(s){
+          return '<button class="setorbtn" data-s="' + s.v + '"><span class="si">' + s.i + '</span>' + s.v + '<span style="font-size:.7rem;color:var(--muted);font-weight:600">' + s.d + '</span></button>';
+        }).join('') +
+      '</div>' +
+      '<div class="msg" id="setorMsg"></div>' +
+    '</div>';
+  Array.prototype.forEach.call(app.querySelectorAll('.setorbtn'), function(b){
+    b.onclick = async function(){
+      var msg = document.getElementById('setorMsg');
+      try {
+        await api('/api/setor', { method:'POST', body: JSON.stringify({ setor: b.getAttribute('data-s') }) });
+        location.href = '/solicitante';
+      } catch (e){ msg.className = 'msg err'; msg.textContent = e.message; }
+    };
+  });
+  navState();
+}
+
+function renderGate(){
+  app.innerHTML =
+    '<div class="panel gate">' +
+      '<div class="ic">🔧</div>' +
+      '<h2>Painel do Recebedor</h2>' +
+      '<p>Apenas o setor <strong>TI</strong> recebe as solicitações: escolhe a <strong>data de entrega</strong> e decide aceitar ou recusar. Digite o token para entrar.</p>' +
+      '<input type="password" id="gateTok" placeholder="Token do recebedor" autocomplete="current-password">' +
+      '<button class="btn" id="gateBtn">Entrar no painel</button>' +
+      '<div class="err" id="gateErr">Token inválido. Tente novamente.</div>' +
+    '</div>';
+  document.getElementById('gateBtn').onclick = entrar;
+  document.getElementById('gateTok').onkeydown = function(e){ if (e.key === 'Enter') entrar(); };
+  navState();
+}
+
+async function entrar(){
+  var v = document.getElementById('gateTok').value.trim();
+  var err = document.getElementById('gateErr');
+  err.style.display = 'none';
+  if (!v){ err.style.display = 'block'; return; }
+  sessionStorage.setItem('svToken', v);
+  try {
+    await api('/api/auth', { method: 'POST' });
+    authed = true;
+    boot();
+  } catch (e){
+    sessionStorage.removeItem('svToken');
+    authed = false;
+    renderGate();
+    var ger = document.getElementById('gateErr');
+    ger.textContent = e.message || 'Token inválido. Tente novamente.';
+    ger.style.display = 'block';
+  }
+}
+
+function renderSolicitante(){
+  app.innerHTML =
+    '<section class="panel"><h2>Nova solicitação <span class="badge">' + esc(meData ? meData.label : '') + (meData && meData.setor ? ' · ' + esc(meData.setor) : '') + '</span></h2>' +
+      '<form id="form"><div class="grid">' +
+        '<label>Nome<input id="nome" maxlength="120" required placeholder="Nome do cliente/empresa"></label>' +
+        '<label>Contato (telefone/WhatsApp)<input id="contato" maxlength="120" required placeholder="(11) 99999-9999"></label>' +
+        '<label>Tipo de serviço<select id="tipo" required>' +
+          '<option value="software">1 — Software</option>' +
+          '<option value="hardware">2 — Hardware</option>' +
+          '<option value="portal">3 — Portal do Cliente</option>' +
+        '</select></label>' +
+        '<label>Prazo desejado (dias, sugestão)<input id="prazo" type="number" min="1" max="365" value="7"></label>' +
+        '<label class="span2">Descrição do serviço<textarea id="descricao" maxlength="1000" required placeholder="Descreva o que precisa ser feito"></textarea></label>' +
+      '</div>' +
+      '<button class="btn" type="submit" style="margin-top:14px">Enviar solicitação</button>' +
+      '<div class="msg" id="formMsg"></div>' +
+      '<p class="sug" style="margin-top:10px">A solicitação sai no seu nome e setor. A data de entrega é escolhida pelo recebedor ao aceitar.</p>' +
+      '</form>' +
+    '</section>' +
+    '<section class="panel"><h2>Solicitações <span class="badge" id="pendCount" style="display:none"></span></h2>' +
+      '<div class="cards" id="lista"><div class="empty">Carregando…</div></div>' +
+    '</section>' +
+    calendarioHTML();
+  document.getElementById('form').onsubmit = enviarForm;
+  wireCal();
+  navState();
+}
+
+function renderRecebedor(){
+  app.innerHTML =
+    '<section class="panel"><h2>Painel do Recebedor <span class="badge" id="pendCount" style="display:none"></span></h2>' +
+      '<div class="stats" id="stats"></div>' +
+      '<h3>⏳ Pendentes — escolha a data e aceite</h3>' +
+      '<div class="cards" id="pendentes"></div>' +
+      '<h3>🛠 Em andamento</h3>' +
+      '<div class="cards" id="andamento"></div>' +
+      '<h3>📦 Histórico</h3>' +
+      '<div class="cards" id="historico"></div>' +
+    '</section>' +
+    calendarioHTML();
+  wireCal();
+  navState();
+}
+
+function calendarioHTML(){
+  return '<section class="panel"><h2>Calendário de entregas (todos veem)</h2>' +
+    '<div class="calnav">' +
+      '<button id="prevM">◀</button><span class="mes" id="mesLabel"></span>' +
+      '<button id="nextM">▶</button><button id="hoje">Hoje</button>' +
+    '</div>' +
+    '<div class="cal" id="cal"></div>' +
+    '<div class="legend">' +
+      '<span><i style="background:#887C00"></i>Software</span>' +
+      '<span><i style="background:#384010;border:1px solid #68701C"></i>Hardware</span>' +
+      '<span><i style="background:#d8cf4e"></i>Portal do Cliente</span>' +
+      '<span style="margin-left:auto">Clique num dia para ver os detalhes</span>' +
+    '</div>' +
+    '<div class="daydetail" id="dayDetail"></div>' +
+    '<h3>Próximas entregas</h3>' +
+    '<div class="prox" id="proximas"><div class="empty">Nenhuma entrega aceita ainda.</div></div>' +
+  '</section>';
+}
+
+function enviarForm(e){
+  e.preventDefault();
+  var msg = document.getElementById('formMsg');
+  msg.className = 'msg'; msg.textContent = '';
+  api(API, { method:'POST', body: JSON.stringify({
+    nome: document.getElementById('nome').value,
+    contato: document.getElementById('contato').value,
+    tipo: document.getElementById('tipo').value,
+    descricao: document.getElementById('descricao').value,
+    prazo_dias: document.getElementById('prazo').value
+  })}).then(function(j){
+    msg.className = 'msg ok';
+    msg.textContent = 'Solicitação enviada! Código ' + j.item.id + ' — aguarde o recebedor escolher a data e aceitar.';
+    e.target.reset();
+    document.getElementById('prazo').value = 7;
+    carregar();
+  }).catch(function(err){ msg.className = 'msg err'; msg.textContent = err.message; });
+}
+
+function acao(id, qual){
+  try {
+    if (qual === 'aceitar'){
+      var d = document.getElementById('dt-' + id).value;
+      if (!d){ alert('Escolha a data de entrega.'); return; }
+      api(API + '/' + id + '/aceitar', { method:'POST', body: JSON.stringify({ entrega: d }) })
+        .then(carregar).catch(function(e){ alert(e.message); });
+    } else if (qual === 'mudar'){
+      var d2 = document.getElementById('dt-' + id).value;
+      if (!d2){ alert('Escolha a nova data.'); return; }
+      api(API + '/' + id + '/entrega', { method:'POST', body: JSON.stringify({ entrega: d2 }) })
+        .then(carregar).catch(function(e){ alert(e.message); });
+    } else if (qual === 'recusar'){
+      if (!confirm('Recusar a solicitação ' + id + '?')) return;
+      var m = prompt('Motivo (opcional):') || '';
+      api(API + '/' + id + '/recusar', { method:'POST', body: JSON.stringify({ motivo: m }) })
+        .then(carregar).catch(function(e){ alert(e.message); });
+    } else if (qual === 'entregue'){
+      if (!confirm('Marcar ' + id + ' como entregue?')) return;
+      api(API + '/' + id + '/entregue', { method:'POST', body: '{}' })
+        .then(carregar).catch(function(e){ alert(e.message); });
+    }
+  } catch (err){ alert(err.message); }
+}
+
+function card(it, modo){
+  var t = TIPOS[it.tipo] || it.tipo;
+  var h = '<div class="card">';
+  h += '<div class="row1"><span class="code">' + esc(it.id) + '</span>';
+  h += '<span class="tag t-' + esc(it.tipo) + '">' + esc(t) + '</span>';
+  h += '<span class="tag st-' + esc(it.status) + '">' + ST[it.status] + '</span></div>';
+  h += '<div class="who">' + esc(it.nome) + '</div>';
+  if (it.solicitante){
+    h += '<div class="reqby">👤 ' + esc(it.solicitante) + (it.setor ? ' · ' + esc(it.setor) : '') + '</div>';
+  }
+  h += '<div class="desc">' + esc(it.descricao) + '</div>';
+  h += '<div class="meta"><span>Contato: ' + esc(it.contato) + '</span>';
+  h += '<span>Solicitado em: ' + new Date(it.criado_em).toLocaleString('pt-BR') + '</span>';
+  if (it.aceito_em) h += '<span>Aceito em: ' + new Date(it.aceito_em).toLocaleString('pt-BR') + '</span>';
+  if (it.motivo) h += '<span>Motivo: ' + esc(it.motivo) + '</span>';
+  h += '</div>';
+  if (it.status === 'pendente'){
+    h += '<div class="sug">Prazo sugerido pelo solicitante: ' + it.prazo_dias + ' dias (a data é do recebedor)</div>';
+  }
+  if (it.status === 'aceita' && it.entrega_prevista){
+    var r = resta(it.entrega_prevista);
+    var cls = r < 0 ? 'atraso' : (r === 0 ? 'hoje' : '');
+    var txt = r < 0 ? ('atrasado ' + Math.abs(r) + 'd') : (r === 0 ? 'entrega hoje!' : ('faltam ' + r + 'd'));
+    h += '<div class="entrega ' + cls + '">📅 Entrega: ' + fmtBR(it.entrega_prevista) + ' · ' + txt + '</div>';
+  }
+  if (it.status === 'entregue' && it.entregue_em){
+    h += '<div class="entrega">✔ Entregue em ' + new Date(it.entregue_em).toLocaleDateString('pt-BR') + '</div>';
+  }
+  if (modo === 'recebedor'){
+    if (it.status === 'pendente'){
+      var sug = somaDias(hoje, it.prazo_dias || 7);
+      h += '<div class="acceptRow">' +
+        '<input type="date" id="dt-' + it.id + '" min="' + ymd(hoje) + '" value="' + sug + '">' +
+        '<div class="actions">' +
+          '<button class="ok" onclick="acao(\'' + it.id + '\',\'aceitar\')">✓ Aceitar</button>' +
+          '<button class="no" onclick="acao(\'' + it.id + '\',\'recusar\')">✗ Recusar</button>' +
+        '</div></div>';
+    } else if (it.status === 'aceita'){
+      h += '<div class="acceptRow">' +
+        '<input type="date" id="dt-' + it.id + '" min="' + ymd(hoje) + '" value="' + esc(it.entrega_prevista) + '">' +
+        '<div class="actions">' +
+          '<button class="ok" onclick="acao(\'' + it.id + '\',\'mudar\')">🗓 Data</button>' +
+          '<button class="ent" onclick="acao(\'' + it.id + '\',\'entregue\')">✔ Concluído</button>' +
+        '</div></div>';
+    }
+  }
+  h += '</div>';
+  return h;
+}
+
+function calendario(){
+  var el;
+  if (!(el = document.getElementById('cal'))) return;
+  var y = calD.getFullYear(), m = calD.getMonth();
+  document.getElementById('mesLabel').textContent = MESES[m] + ' ' + y;
+  var porDia = {};
+  items.forEach(function(it){
+    if (it.status === 'recusada' || it.status === 'pendente') return;
+    var d = dataEntrega(it);
+    if (!d) return;
+    (porDia[d] = porDia[d] || []).push(it);
+  });
+  var html = DOW.map(function(d){ return '<div class="dow">' + d + '</div>'; }).join('');
+  var first = new Date(y, m, 1).getDay();
+  var total = new Date(y, m + 1, 0).getDate();
+  var prevTotal = new Date(y, m, 0).getDate();
+  var cells = [];
+  for (var i = first - 1; i >= 0; i--) cells.push({ n: prevTotal - i, out: true, key: '' });
+  for (var d = 1; d <= total; d++) cells.push({ n: d, out: false, key: ymd(new Date(y, m, d)) });
+  while (cells.length % 7 !== 0) cells.push({ n: cells.length - first - total + 1, out: true, key: '' });
+  cells.forEach(function(c){
+    var cls = 'cell' + (c.out ? ' out' : '') + (c.key === ymd(hoje) ? ' today' : '') + (c.key && c.key === selDay ? ' sel' : '');
+    var h = '<div class="' + cls + '"' + (c.key ? ' data-d="' + c.key + '"' : '') + '>';
+    h += '<span class="num">' + c.n + '</span>';
+    var ev = c.key ? (porDia[c.key] || []) : [];
+    ev.slice(0, 2).forEach(function(it){
+      h += '<span class="chip t-' + esc(it.tipo) + '" title="' + esc(it.nome) + '">' + (TIPOS[it.tipo]||'') + '</span>';
+    });
+    if (ev.length > 2) h += '<span class="chip more">+' + (ev.length - 2) + '</span>';
+    h += '</div>';
+    html += h;
+  });
+  el.innerHTML = html;
+  Array.prototype.forEach.call(el.querySelectorAll('.cell[data-d]'), function(c){
+    c.onclick = function(){ selDay = c.getAttribute('data-d'); calendario(); };
+  });
+  mostrarDia(selDay, porDia);
+
+  var aceitas = items.filter(function(it){ return it.status === 'aceita' && it.entrega_prevista; })
+    .sort(function(a,b){ return a.entrega_prevista.localeCompare(b.entrega_prevista); });
+  var ph = document.getElementById('proximas');
+  ph.innerHTML = aceitas.length ? aceitas.map(function(it){
+    var r = resta(it.entrega_prevista);
+    return '<div class="p-item"><span class="p-date">' + fmtBR(it.entrega_prevista) + '</span>' +
+      '<span class="tag t-' + esc(it.tipo) + '">' + TIPOS[it.tipo] + '</span>' +
+      '<span>' + esc(it.nome) + ' — ' + esc(it.descricao).slice(0, 90) + '</span>' +
+      '<span style="margin-left:auto;font-weight:700;color:' + (r<0?'#ff8d7a':'#a4aa7c') + '">' +
+      (r < 0 ? 'atrasado ' + Math.abs(r) + 'd' : (r === 0 ? 'hoje' : 'faltam ' + r + 'd')) + '</span></div>';
+  }).join('') : '<div class="empty">Nenhuma entrega aceita ainda.</div>';
+}
+
+function mostrarDia(d, porDia){
+  var box = document.getElementById('dayDetail');
+  if (!box) return;
+  if (!d){ box.className = 'daydetail'; box.innerHTML = ''; return; }
+  var ev = porDia[d] || [];
+  var h = '<h4>' + fmtBR(d) + ' — ' + ev.length + ' entrega(s)</h4>';
+  if (!ev.length) h += '<div class="empty">Nenhuma entrega neste dia.</div>';
+  else {
+    h += '<ul>' + ev.map(function(it){
+      return '<li><span class="tag t-' + esc(it.tipo) + '">' + TIPOS[it.tipo] + '</span>' +
+        '<strong>' + esc(it.nome) + '</strong> — ' + esc(it.descricao).slice(0, 120) +
+        (it.solicitante ? ' <span class="code">👤 ' + esc(it.solicitante) + '</span>' : '') +
+        ' <span class="code">(' + it.id + ')</span></li>';
+    }).join('') + '</ul>';
+  }
+  box.className = 'daydetail show';
+  box.innerHTML = h;
+}
+
+function renderListas(){
+  if (view === '/solicitante'){
+    var lista = document.getElementById('lista');
+    if (!lista) return;
+    lista.innerHTML = items.length ? items.map(function(it){ return card(it, 'solicitante'); }).join('')
+      : '<div class="empty">Nenhuma solicitação ainda. Crie a primeira acima!</div>';
+    var pend = items.filter(function(i){ return i.status === 'pendente'; }).length;
+    var badge = document.getElementById('pendCount');
+    badge.style.display = pend ? 'inline-block' : 'none';
+    badge.textContent = pend + ' pendente' + (pend > 1 ? 's' : '');
+  } else if (view === '/recebedor' && authed){
+    var p = items.filter(function(i){ return i.status === 'pendente'; });
+    var a = items.filter(function(i){ return i.status === 'aceita'; });
+    var h = items.filter(function(i){ return i.status === 'entregue' || i.status === 'recusada'; });
+    document.getElementById('pendentes').innerHTML = p.length ? p.map(function(it){ return card(it, 'recebedor'); }).join('') : '<div class="empty">Nada pendente. 👍</div>';
+    document.getElementById('andamento').innerHTML = a.length ? a.map(function(it){ return card(it, 'recebedor'); }).join('') : '<div class="empty">Nenhum serviço em andamento.</div>';
+    document.getElementById('historico').innerHTML = h.length ? h.map(function(it){ return card(it, 'recebedor'); }).join('') : '<div class="empty">Sem histórico ainda.</div>';
+    document.getElementById('stats').innerHTML =
+      '<div class="stat"><b>' + p.length + '</b><span>Pendentes</span></div>' +
+      '<div class="stat"><b>' + a.length + '</b><span>Em andamento</span></div>' +
+      '<div class="stat"><b>' + items.filter(function(i){ return i.status === 'entregue'; }).length + '</b><span>Entregues</span></div>' +
+      '<div class="stat"><b>' + items.filter(function(i){ return i.status === 'recusada'; }).length + '</b><span>Recusadas</span></div>';
+    var badge2 = document.getElementById('pendCount');
+    badge2.style.display = p.length ? 'inline-block' : 'none';
+    badge2.textContent = p.length + ' pendente' + (p.length > 1 ? 's' : '');
+  }
+  calendario();
+}
+
+function wireCal(){
+  var pm = document.getElementById('prevM'), nm = document.getElementById('nextM'), hj = document.getElementById('hoje');
+  if (!pm) return;
+  pm.onclick = function(){ calD = new Date(calD.getFullYear(), calD.getMonth()-1, 1); calendario(); };
+  nm.onclick = function(){ calD = new Date(calD.getFullYear(), calD.getMonth()+1, 1); calendario(); };
+  hj.onclick = function(){ calD = new Date(hoje.getFullYear(), hoje.getMonth(), 1); selDay = ymd(hoje); calendario(); };
+}
+
+async function carregar(){
+  var j = await api(API);
+  items = j.items || [];
+  renderListas();
+}
+
+async function boot(){
+  navState();
+  if (polling){ clearInterval(polling); polling = null; }
+
+  if (view === '/'){
+    if (!sess()){ renderLogin(); return; }
+    try {
+      var me = await api('/api/me');
+      meData = me;
+      if (me.precisaSetor){ renderSetor(me); return; }
+      location.href = '/solicitante'; return;
+    } catch (e){ renderLogin(); return; }
+  }
+
+  if (!sess()){ location.href = '/'; return; }
+  try {
+    var me2 = await api('/api/me');
+    meData = me2;
+    if (me2.precisaSetor){ location.href = '/'; return; }
+  } catch (e){ return; }
+
+  if (view === '/solicitante'){
+    renderSolicitante();
+  } else if (view === '/recebedor'){
+    if (me2.setor !== 'TI'){ location.href = '/solicitante'; return; }
+    if (!tok()){ renderGate(); return; }
+    if (!authed){
+      app.innerHTML = '<div class="panel"><div class="empty">Verificando token…</div></div>';
+      try { await api('/api/auth', { method: 'POST' }); authed = true; }
+      catch (e){ renderGate(); return; }
+    }
+    renderRecebedor();
+  }
+  navState();
+  carregar().catch(function(e){
+    if (view === '/solicitante'){
+      var l = document.getElementById('lista');
+      if (l) l.innerHTML = '<div class="empty">Erro ao carregar: ' + esc(e.message) + '</div>';
+    }
+  });
+  polling = setInterval(function(){ carregar().catch(function(){}); }, 15000);
+}
+
+boot();
+</script>
+</body>
+</html>
