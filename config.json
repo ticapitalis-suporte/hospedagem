@@ -1,0 +1,6 @@
+{
+  "port": 8002,
+  "adminToken": "021218@Ma",
+  "painelUrl": "http://localhost:1945",
+  "manutencaoArquivo": "/opt/painel-capitalis/data/manutencao.json"
+}
